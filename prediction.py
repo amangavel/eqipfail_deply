@@ -24,9 +24,6 @@ def load_data():
 def main():
     df = load_data()
     st.title("Equipment Failure Prediction")
-    selected_page = st.page_link("app.py", label="Home", icon="🏠")
-    selected_page = st.page_link('pages/dataVisualization.py', label="Data Visualization And Analysis", icon="📊")
-    selected_page = st.page_link('pages/prediction.py', label="Prediction", icon="⚙")
 
     st.header("Prediction")
     st.write("Enter the following parameters to predict equipment failure:")
