@@ -11,6 +11,7 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.multioutput import MultiOutputClassifier
 from sklearn.pipeline import Pipeline
 from keras.models import load_model
+from joblib import load
 
 # Load the data
 @st.cache_data
@@ -129,33 +130,12 @@ def RF_predict(user_input,df):
     ## Assuming 'df' is your DataFrame and it has been created from your data source
 
     features = ['Air temperature [K]', 'Process temperature [K]', 'Rotational speed [rpm]', 'Torque [Nm]', 'Tool wear [min]']
-    failure_types = ['TWF', 'HDF', 'PWF', 'OSF', 'RNF']
     scaler = StandardScaler()
     X = scaler.fit_transform(df1[features])
-    # Split the data into training and test sets
-    X_train, X_test, y_train, y_test = train_test_split(X, df1[failure_types], test_size=0.3, random_state=42)
     
-    # Create a Random Forest classifier
-    rf_classifier = RandomForestClassifier()
+    # load the pipeline
+    pipeline = load('pipeline.joblib')
 
-    # Create a Keras model (you can customize this architecture)
-    model = Sequential()
-    model.add(Dense(64, activation='relu', input_dim=X_train.shape[1]))
-    model.add(Dense(len(failure_types), activation='sigmoid'))
-
-    # Compile the Keras model
-    model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
-
-    # Create a multi-output classifier with the Random Forest and Keras model
-    multi_output_classifier = MultiOutputClassifier(estimator=rf_classifier, n_jobs=-1)
-
-    # Create a pipeline
-    pipeline = Pipeline([
-        ('classifier', multi_output_classifier)
-    ])
-
-    # Fit the pipeline to the training data
-    pipeline.fit(X_train, y_train)
     user_input_scaled = scaler.transform(user_input)
     prediction = pipeline.predict_proba(user_input_scaled)
     return prediction
